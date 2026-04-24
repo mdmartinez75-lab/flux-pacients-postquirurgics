@@ -1,113 +1,459 @@
-Flux Pacients Postquirúrgics
-Connectat · temps real
-🖨 Imprimir
-13:51:46
-Ingressats
-0
-Alta possible
-0
-Alta pendent de llit
-0
-Llit assignat
-0
-Lliures
-36
-Pacients a quiròfan — per zona de destí
-UCPA
-0 pacients
-Cap pacient a quiròfan.
-+ Afegir a UCPA
-URPA
-0 pacients
-Cap pacient a quiròfan.
-+ Afegir a URPA
-PRE-IQ
-0 pacients
-Cap pacient a quiròfan.
-+ Afegir a PRE-IQ
-CMA
-0 pacients
-Cap pacient a quiròfan.
-+ Afegir a CMA
-Unitats
-UCPA
-0/14 · 0%
-201
-202
-203
-204
-205
-206
-207
-208
-209
-210
-211
-212
-213
-214
-Ingressats
-0
-Alta possible
-0
-Alta pendent de llit
-0
-Llit assignat
-0
-URPA
-0/9 · 0%
-211
-212
-213
-214
-215
-216
-217
-218
-219
-Ingressats
-0
-Alta possible
-0
-Alta pendent de llit
-0
-Llit assignat
-0
-PRE-IQ
-0/8 · 0%
-240
-241
-242
-243
-244
-245
-246
-247
-Ingressats
-0
-Alta possible
-0
-Alta pendent de llit
-0
-Llit assignat
-0
-CMA
-0/5 · 0%
-1
-2
-3
-4
-5
-Ingressats
-0
-Alta possible
-0
-Alta pendent de llit
-0
-Llit assignat
-0
-Ingressat
-Alta possible
-Alta pendent de llit
-Llit assignat
-Lliure
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flux Pacients Postquirúrgics</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a1a; font-size: 14px; }
+.dashboard { max-width: 1100px; margin: 0 auto; padding: 1.25rem 1rem 2rem; }
+.header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 8px; }
+.header h1 { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.clock { font-size: 13px; color: #666; font-variant-numeric: tabular-nums; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; display: inline-block; margin-right: 4px; transition: background 0.3s; }
+.sync-dot.connected { background: #22c55e; }
+.sync-dot.saving { background: #f59e0b; }
+.sync-info { font-size: 11px; color: #999; display: flex; align-items: center; }
+.btn-print { font-size: 12px; padding: 4px 12px; border: 1px solid #2563eb; border-radius: 6px; background: #2563eb; cursor: pointer; color: white; font-weight: 600; }
+.btn-print:hover { background: #1d4ed8; }
+
+.summary-bar { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; margin-bottom: 1.25rem; }
+.sum-card { background: white; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 12px; }
+.sum-label { font-size: 10px; color: #888; margin-bottom: 3px; line-height: 1.3; }
+.sum-val { font-size: 22px; font-weight: 600; }
+
+.sec-label { font-size: 10px; font-weight: 600; color: #999; letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 8px; margin-top: 1.25rem; }
+
+.qx-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+.qx-zone { background: white; border: 1px solid #e5e5e5; border-radius: 10px; padding: 0.875rem 1rem; }
+.qx-zone-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+.qx-zone-name { font-size: 13px; font-weight: 600; }
+.qx-zone-badge { font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 600; }
+.badge-UCPA  { background:#dbeafe; color:#1e40af; }
+.badge-URPA  { background:#ede9fe; color:#5b21b6; }
+.badge-PREIQ { background:#fef3c7; color:#92400e; }
+.badge-CMA   { background:#dcfce7; color:#166534; }
+.qx-patient { display: flex; align-items: flex-start; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f5f5f5; cursor: pointer; gap: 8px; }
+.qx-patient:last-of-type { border-bottom: none; }
+.qx-patient:hover { background: #fafafa; margin: 0 -4px; padding-left: 4px; padding-right: 4px; border-radius: 4px; }
+.qx-p-name { font-size: 12px; font-weight: 600; color: #1a1a1a; }
+.qx-p-sub { font-size: 10px; color: #888; margin-top: 1px; }
+.qx-p-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+.qx-hora { font-size: 10px; color: #666; font-variant-numeric: tabular-nums; font-weight: 600; }
+.btn-del-sm { font-size: 10px; padding: 1px 7px; border: 1px solid #fca5a5; border-radius: 4px; background: white; color: #dc2626; cursor: pointer; }
+.btn-del-sm:hover { background: #fef2f2; }
+.qx-empty-zone { font-size: 11px; color: #bbb; padding: 6px 0; }
+.btn-add-sm { font-size: 11px; padding: 5px 10px; margin-top: 8px; width: 100%; border: 1px solid #d1d5db; border-radius: 6px; background: #fafafa; cursor: pointer; color: #555; }
+.btn-add-sm:hover { background: #f0f0f0; }
+
+.zones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.zone-card { background: white; border: 1px solid #e5e5e5; border-radius: 10px; padding: 1rem 1.25rem; }
+.zone-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f0f0f0; }
+.zone-name { font-size: 14px; font-weight: 700; }
+.zone-occ { font-size: 12px; color: #888; }
+.beds { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+.bed { height: 30px; min-width: 36px; padding: 0 4px; border-radius: 5px; border: 1px solid transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 9px; font-weight: 700; transition: opacity 0.15s, transform 0.1s; flex-shrink: 0; }
+.bed:hover { opacity: 0.8; transform: scale(1.05); }
+.bed-lliure    { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; }
+.bed-ingressat { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+.bed-possible  { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.bed-pendent   { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.bed-assignat  { background: #dcfce7; color: #166534; border-color: #86efac; }
+.zone-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; }
+.zs { background: #f9f9f9; border-radius: 6px; padding: 6px 8px; }
+.zs-label { font-size: 9px; color: #888; line-height: 1.3; margin-bottom: 2px; }
+.zs-val { font-size: 16px; font-weight: 700; }
+
+.legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.25rem; padding-top: 0.875rem; border-top: 1px solid #e5e5e5; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #666; }
+.leg-dot { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; border: 1px solid transparent; }
+
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; z-index: 100; }
+.modal-bg.open { display: flex; }
+.modal { background: white; border-radius: 12px; border: 1px solid #e5e5e5; padding: 1.5rem; width: 320px; max-width: 95vw; box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+.modal h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: #1a1a1a; }
+.modal label { font-size: 11px; color: #666; display: block; margin-bottom: 4px; margin-top: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+.modal select, .modal input[type=text], .modal input[type=number], .modal input[type=time] {
+  width: 100%; font-size: 13px; padding: 7px 10px; border: 1px solid #d1d5db; border-radius: 6px; background: white; color: #1a1a1a; outline: none;
+}
+.modal select:focus, .modal input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+.modal-actions button { flex: 1; font-size: 13px; padding: 8px; border-radius: 7px; cursor: pointer; font-weight: 600; border: 1px solid #d1d5db; background: white; color: #444; }
+.modal-actions button:hover { background: #f5f5f5; }
+.btn-primary { background: #2563eb !important; color: white !important; border-color: #2563eb !important; }
+.btn-primary:hover { background: #1d4ed8 !important; }
+.btn-danger { border-color: #fca5a5 !important; color: #dc2626 !important; }
+.btn-danger:hover { background: #fef2f2 !important; }
+
+.toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: white; font-size: 12px; padding: 8px 18px; border-radius: 99px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
+.toast.show { opacity: 1; }
+.print-timestamp { display: none; font-size: 10px; color: #666; }
+
+@media (max-width: 600px) {
+  .summary-bar { grid-template-columns: repeat(3, 1fr); }
+  .zones, .qx-grid { grid-template-columns: 1fr; }
+}
+
+@media print {
+  @page { size: A4 landscape; margin: 1cm; }
+  body { background: white; font-size: 11px; }
+  .dashboard { max-width: 100%; padding: 0; }
+  .btn-print, .sync-info, .toast { display: none !important; }
+  .modal-bg { display: none !important; }
+  .header { margin-bottom: 0.5rem; }
+  .print-timestamp { display: block !important; }
+  .summary-bar { gap: 5px; margin-bottom: 0.75rem; }
+  .sum-card { padding: 6px 8px; }
+  .sum-val { font-size: 16px; }
+  .btn-del-sm, .btn-add-sm { display: none !important; }
+  .zones, .qx-grid { gap: 8px; }
+  .zone-card, .qx-zone { padding: 8px 10px; page-break-inside: avoid; }
+  .bed { height: 22px; min-width: 30px; font-size: 8px; }
+  .bed-lliure    { background: #f3f4f6 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bed-ingressat { background: #dbeafe !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bed-possible  { background: #fef3c7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bed-pendent   { background: #fee2e2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .bed-assignat  { background: #dcfce7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .badge-UCPA  { background:#dbeafe !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .badge-URPA  { background:#ede9fe !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .badge-PREIQ { background:#fef3c7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .badge-CMA   { background:#dcfce7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .zs { background: #f9f9f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .legend { margin-top: 0.5rem; }
+  .leg-item { font-size: 9px; }
+}
+</style>
+</head>
+<body>
+<div class="dashboard">
+  <div class="header">
+    <div>
+      <h1>Flux Pacients Postquirúrgics</h1>
+      <span class="print-timestamp" id="print-timestamp"></span>
+    </div>
+    <div class="header-right">
+      <span class="sync-info"><span class="sync-dot" id="sync-dot"></span><span id="sync-info">Connectant...</span></span>
+      <button class="btn-print" onclick="window.print()">🖨 Imprimir</button>
+      <span class="clock" id="clock">--:--:--</span>
+    </div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="sum-card"><div class="sum-label">Ingressats</div><div class="sum-val" id="s-ingressat" style="color:#1e40af">0</div></div>
+    <div class="sum-card"><div class="sum-label">Alta possible</div><div class="sum-val" id="s-possible" style="color:#92400e">0</div></div>
+    <div class="sum-card"><div class="sum-label">Alta pendent de llit</div><div class="sum-val" id="s-pendent" style="color:#991b1b">0</div></div>
+    <div class="sum-card"><div class="sum-label">Llit assignat</div><div class="sum-val" id="s-assignat" style="color:#166534">0</div></div>
+    <div class="sum-card"><div class="sum-label">Lliures</div><div class="sum-val" id="s-lliure" style="color:#444">0</div></div>
+  </div>
+
+  <div class="sec-label">Pacients a quiròfan — per zona de destí</div>
+  <div class="qx-grid" id="qx-grid"></div>
+
+  <div class="sec-label">Unitats</div>
+  <div class="zones" id="zones-container"></div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#dbeafe;border-color:#93c5fd"></div>Ingressat</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fef3c7;border-color:#fcd34d"></div>Alta possible</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#fee2e2;border-color:#fca5a5"></div>Alta pendent de llit</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#dcfce7;border-color:#86efac"></div>Llit assignat</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#f3f4f6;border-color:#e5e7eb"></div>Lliure</div>
+  </div>
+</div>
+
+<!-- Modal quiròfan -->
+<div class="modal-bg" id="qx-modal-bg">
+  <div class="modal">
+    <h3 id="qx-modal-title">Pacient a quiròfan</h3>
+    <label>Zona de destí</label>
+    <select id="qm-desti">
+      <option value="UCPA">UCPA</option>
+      <option value="URPA">URPA</option>
+      <option value="PREIQ">PRE-IQ</option>
+      <option value="CMA">CMA</option>
+    </select>
+    <label>Quiròfan núm.</label>
+    <input type="text" id="qm-qx" placeholder="ex. Q3" />
+    <label>Tipus d'intervenció</label>
+    <input type="text" id="qm-intervencio" placeholder="ex. Colecistectomia laparoscòpica" />
+    <label>Hora estimada de sortida</label>
+    <input type="time" id="qm-hora" />
+    <label>Nota</label>
+    <input type="text" id="qm-nota" placeholder="Observació breu" />
+    <div class="modal-actions">
+      <button id="qm-btn-del" class="btn-danger" onclick="deleteQx()" style="display:none">Eliminar</button>
+      <button onclick="closeQxModal()">Cancel·lar</button>
+      <button class="btn-primary" onclick="saveQxModal()">Desar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal llit -->
+<div class="modal-bg" id="bed-modal-bg">
+  <div class="modal">
+    <h3 id="bed-modal-title">Llit</h3>
+    <label>Estat</label>
+    <select id="m-estat">
+      <option value="lliure">Lliure</option>
+      <option value="ingressat">Ingressat</option>
+      <option value="possible">Alta possible</option>
+      <option value="pendent">Alta pendent de llit</option>
+      <option value="assignat">Llit assignat (destí confirmat)</option>
+    </select>
+    <label>Temps a la unitat (min)</label>
+    <input type="number" id="m-temps" placeholder="0" min="0" max="9999" />
+    <label>Llit destí</label>
+    <input type="text" id="m-desti" placeholder="ex. Planta 4 — 412B" />
+    <label>Nota</label>
+    <input type="text" id="m-nota" placeholder="Observació breu" />
+    <div class="modal-actions">
+      <button onclick="closeBedModal()">Cancel·lar</button>
+      <button class="btn-primary" onclick="saveBedModal()">Desar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, onValue, set, push, remove, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const FIREBASE_URL = 'https://flux-pacientes-post-quirurgics-default-rtdb.europe-west1.firebasedatabase.app';
+
+const app = initializeApp({ databaseURL: FIREBASE_URL });
+const db  = getDatabase(app);
+
+const ZONES = [
+  { id: 'UCPA',  name: 'UCPA',   bedNums: Array.from({length:14}, (_,i) => 201+i) },
+  { id: 'URPA',  name: 'URPA',   bedNums: Array.from({length:9},  (_,i) => 211+i) },
+  { id: 'PREIQ', name: 'PRE-IQ', bedNums: Array.from({length:8},  (_,i) => 240+i) },
+  { id: 'CMA',   name: 'CMA',    bedNums: Array.from({length:5},  (_,i) => i+1)   },
+];
+const ESTATS = ['lliure','ingressat','possible','pendent','assignat'];
+
+let bedState = {};
+let qxList   = {};
+let qxEditKey  = null;
+let bedEditKey = null;
+
+function setSyncStatus(status) {
+  const dot  = document.getElementById('sync-dot');
+  const info = document.getElementById('sync-info');
+  if (status === 'connected') {
+    dot.className = 'sync-dot connected';
+    info.textContent = 'Connectat · temps real';
+  } else if (status === 'saving') {
+    dot.className = 'sync-dot saving';
+    info.textContent = 'Desant...';
+  } else {
+    dot.className = 'sync-dot';
+    info.textContent = 'Sense connexió';
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function zoneStats(zoneId) {
+  const z = ZONES.find(z => z.id === zoneId);
+  const c = { lliure:0, ingressat:0, possible:0, pendent:0, assignat:0 };
+  z.bedNums.forEach(num => {
+    const key = `${zoneId}_${num}`;
+    const estat = (bedState[key] && bedState[key].estat) || 'lliure';
+    c[estat]++;
+  });
+  return { ...c, occ: z.bedNums.length - c.lliure, total: z.bedNums.length };
+}
+
+function renderQx() {
+  const grid = document.getElementById('qx-grid');
+  grid.innerHTML = '';
+  ZONES.forEach(z => {
+    const patients = Object.entries(qxList).filter(([,p]) => p.desti === z.id);
+    let pHTML = patients.length === 0
+      ? `<div class="qx-empty-zone">Cap pacient a quiròfan.</div>`
+      : patients.map(([key, p]) => {
+          const sub = [p.qx ? `Q ${p.qx}` : null, p.intervencio || null].filter(Boolean).join(' · ');
+          return `<div class="qx-patient" onclick="window._openQxModal('${key}')">
+            <div>
+              <div class="qx-p-name">${p.intervencio || '— sense intervenció —'}</div>
+              <div class="qx-p-sub">${sub || '—'}</div>
+            </div>
+            <div class="qx-p-right">
+              ${p.hora ? `<span class="qx-hora">${p.hora}</span>` : ''}
+              <button class="btn-del-sm" onclick="event.stopPropagation();window._deleteQx('${key}')">Eliminar</button>
+            </div>
+          </div>`;
+        }).join('');
+
+    const div = document.createElement('div');
+    div.className = 'qx-zone';
+    div.innerHTML = `
+      <div class="qx-zone-header">
+        <span class="qx-zone-name">${z.name}</span>
+        <span class="qx-zone-badge badge-${z.id}">${patients.length} pacient${patients.length !== 1 ? 's' : ''}</span>
+      </div>
+      ${pHTML}
+      <button class="btn-add-sm" onclick="window._openQxModal(null,'${z.id}')">+ Afegir a ${z.name}</button>`;
+    grid.appendChild(div);
+  });
+}
+
+function renderBeds() {
+  const container = document.getElementById('zones-container');
+  container.innerHTML = '';
+  const totals = { lliure:0, ingressat:0, possible:0, pendent:0, assignat:0 };
+
+  ZONES.forEach(z => {
+    const st = zoneStats(z.id);
+    ESTATS.forEach(e => totals[e] += st[e]);
+    const bedsHTML = z.bedNums.map(num => {
+      const key = `${z.id}_${num}`;
+      const s = bedState[key] || { estat:'lliure' };
+      const tip = `Llit ${num}${s.desti?' → '+s.desti:''}${s.nota?' | '+s.nota:''}`;
+      return `<div class="bed bed-${s.estat}" onclick="window._openBedModal('${key}')" title="${tip}">${num}</div>`;
+    }).join('');
+
+    const pct = Math.round(st.occ / st.total * 100);
+    const card = document.createElement('div');
+    card.className = 'zone-card';
+    card.innerHTML = `
+      <div class="zone-header">
+        <span class="zone-name">${z.name}</span>
+        <span class="zone-occ">${st.occ}/${st.total} · ${pct}%</span>
+      </div>
+      <div class="beds">${bedsHTML}</div>
+      <div class="zone-stats">
+        <div class="zs"><div class="zs-label">Ingressats</div><div class="zs-val" style="color:#1e40af">${st.ingressat}</div></div>
+        <div class="zs"><div class="zs-label">Alta possible</div><div class="zs-val" style="color:#92400e">${st.possible}</div></div>
+        <div class="zs"><div class="zs-label">Alta pendent de llit</div><div class="zs-val" style="color:#991b1b">${st.pendent}</div></div>
+        <div class="zs"><div class="zs-label">Llit assignat</div><div class="zs-val" style="color:#166534">${st.assignat}</div></div>
+      </div>`;
+    container.appendChild(card);
+  });
+
+  document.getElementById('s-ingressat').textContent = totals.ingressat;
+  document.getElementById('s-possible').textContent  = totals.possible;
+  document.getElementById('s-pendent').textContent   = totals.pendent;
+  document.getElementById('s-assignat').textContent  = totals.assignat;
+  document.getElementById('s-lliure').textContent    = totals.lliure;
+}
+
+function render() { renderQx(); renderBeds(); }
+
+onValue(ref(db, 'beds'), snap => {
+  bedState = snap.val() || {};
+  setSyncStatus('connected');
+  renderBeds();
+});
+
+onValue(ref(db, 'qx'), snap => {
+  qxList = snap.val() || {};
+  renderQx();
+});
+
+window._openQxModal = function(key, presetDesti) {
+  qxEditKey = key || null;
+  const p = key && qxList[key] ? qxList[key] : {};
+  document.getElementById('qx-modal-title').textContent = key ? 'Editar pacient a quiròfan' : 'Nou pacient a quiròfan';
+  document.getElementById('qm-desti').value       = p.desti || presetDesti || 'UCPA';
+  document.getElementById('qm-qx').value          = p.qx || '';
+  document.getElementById('qm-intervencio').value = p.intervencio || '';
+  document.getElementById('qm-hora').value        = p.hora || '';
+  document.getElementById('qm-nota').value        = p.nota || '';
+  document.getElementById('qm-btn-del').style.display = key ? '' : 'none';
+  document.getElementById('qx-modal-bg').classList.add('open');
+};
+
+window.closeQxModal = function() {
+  document.getElementById('qx-modal-bg').classList.remove('open');
+  qxEditKey = null;
+};
+
+window.saveQxModal = async function() {
+  const p = {
+    desti:       document.getElementById('qm-desti').value,
+    qx:          document.getElementById('qm-qx').value,
+    intervencio: document.getElementById('qm-intervencio').value,
+    hora:        document.getElementById('qm-hora').value,
+    nota:        document.getElementById('qm-nota').value,
+  };
+  setSyncStatus('saving');
+  if (qxEditKey) {
+    await set(ref(db, `qx/${qxEditKey}`), p);
+  } else {
+    await push(ref(db, 'qx'), p);
+  }
+  setSyncStatus('connected');
+  showToast('Desat');
+  window.closeQxModal();
+};
+
+window._deleteQx = async function(key) {
+  setSyncStatus('saving');
+  await remove(ref(db, `qx/${key}`));
+  setSyncStatus('connected');
+  showToast('Eliminat');
+};
+
+window.deleteQx = async function() {
+  if (!qxEditKey) return;
+  await window._deleteQx(qxEditKey);
+  window.closeQxModal();
+};
+
+window._openBedModal = function(key) {
+  bedEditKey = key;
+  const s = bedState[key] || { estat:'lliure', temps:0, desti:'', nota:'' };
+  const parts = key.split('_');
+  const num    = parts[parts.length - 1];
+  const zoneId = parts.slice(0, -1).join('_');
+  const zoneName = ZONES.find(z => z.id === zoneId)?.name || zoneId;
+  document.getElementById('bed-modal-title').textContent = `${zoneName} — Llit ${num}`;
+  document.getElementById('m-estat').value  = s.estat || 'lliure';
+  document.getElementById('m-temps').value  = s.temps || '';
+  document.getElementById('m-desti').value  = s.desti || '';
+  document.getElementById('m-nota').value   = s.nota  || '';
+  document.getElementById('bed-modal-bg').classList.add('open');
+};
+
+window.closeBedModal = function() {
+  document.getElementById('bed-modal-bg').classList.remove('open');
+  bedEditKey = null;
+};
+
+window.saveBedModal = async function() {
+  if (!bedEditKey) return;
+  const data = {
+    estat: document.getElementById('m-estat').value,
+    temps: parseInt(document.getElementById('m-temps').value) || 0,
+    desti: document.getElementById('m-desti').value,
+    nota:  document.getElementById('m-nota').value,
+  };
+  setSyncStatus('saving');
+  await set(ref(db, `beds/${bedEditKey}`), data);
+  setSyncStatus('connected');
+  showToast('Desat');
+  window.closeBedModal();
+};
+
+document.getElementById('bed-modal-bg').addEventListener('click', e => { if (e.target.id === 'bed-modal-bg') window.closeBedModal(); });
+document.getElementById('qx-modal-bg').addEventListener('click',  e => { if (e.target.id === 'qx-modal-bg')  window.closeQxModal(); });
+
+setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('ca-ES'); }, 1000);
+document.getElementById('clock').textContent = new Date().toLocaleTimeString('ca-ES');
+
+window.addEventListener('beforeprint', () => {
+  const now = new Date();
+  document.getElementById('print-timestamp').textContent =
+    `Imprès el ${now.toLocaleDateString('ca-ES')} a les ${now.toLocaleTimeString('ca-ES')}`;
+});
+</script>
+</body>
+</html>
